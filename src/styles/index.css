@@ -22,7 +22,10 @@ header h1 { margin: 0; font-size: 1.8rem; }
 .key-present { background: #b59f3b; }
 .key-absent { background: #3a3a3c; }
 .key-large { min-width: 70px; }
-.status p { margin: 8px 0; }
+.status { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+.status p { margin: 0; flex: 1; }
+.play-again-btn { padding: 8px 16px; background: #538d4e; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: background 0.2s; white-space: nowrap; }
+.play-again-btn:hover { background: #6aae5e; }
 .statistics { margin-top: 18px; background: #18181b; border-radius: 8px; padding: 9px; }
 @media (max-width: 600px) {
   .app-container { padding: 12px; }

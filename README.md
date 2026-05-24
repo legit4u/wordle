@@ -1,4 +1,4 @@
-# Wordle Clone
+# Wordal
 
 A small Wordle-style React app built with Vite.
 

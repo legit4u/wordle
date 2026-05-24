@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 import wordList from '../data/words.json';
 import difficultWords from '../data/words-difficult.json';
 import { getDailySolution, getRandomSolution, evaluateGuess, isValidWord } from '../utils/wordUtils';
+import { sendEvent } from '../utils/analytics';
 
 const GameContext = createContext(null);
 const WORD_LENGTH = 5;
@@ -25,7 +26,7 @@ function writeStats(stats) {
 }
 
 export function GameProvider({ children }) {
-  const [mode, setMode] = useState('daily');
+  const [mode, setMode] = useState('unlimited');
   const [solution, setSolution] = useState('');
   const [guesses, setGuesses] = useState([]);
   const [currentGuess, setCurrentGuess] = useState('');
@@ -60,6 +61,8 @@ export function GameProvider({ children }) {
     setIsGameOver(false);
     setIsWin(false);
     setMessage('');
+    // Analytics: record a new game start (no PII)
+    sendEvent('game_start', { mode: newMode, difficulty: newDifficulty });
   };
 
   useEffect(() => {
@@ -87,9 +90,16 @@ export function GameProvider({ children }) {
     resetGame(newMode);
   };
 
+
   const onDifficultyChange = (newDifficulty) => {
     if (newDifficulty === difficulty) return;
     resetGame(mode, newDifficulty);
+    // Analytics: record difficulty change
+    sendEvent('change_difficulty', { difficulty: newDifficulty, mode });
+  };
+
+  const playAgain = () => {
+    resetGame(mode, difficulty);
   };
 
   const onInput = (letter) => {
@@ -131,6 +141,8 @@ export function GameProvider({ children }) {
       setIsWin(true);
       updateStats(true, nextGuesses.length);
       setMessage('Congratulations!');
+      // Analytics: game finished - win
+      sendEvent('game_end', { result: 'win', guesses: nextGuesses.length, difficulty, mode });
       return;
     }
 
@@ -139,6 +151,8 @@ export function GameProvider({ children }) {
       setIsWin(false);
       updateStats(false, MAX_TURNS);
       setMessage('Game over, good effort.');
+      // Analytics: game finished - loss
+      sendEvent('game_end', { result: 'loss', guesses: MAX_TURNS, difficulty, mode });
     }
   };
 
@@ -165,7 +179,8 @@ export function GameProvider({ children }) {
         onEnter,
         onDelete,
         onModeChange,
-        onDifficultyChange
+        onDifficultyChange,
+        playAgain
       }}
     >
       {children}

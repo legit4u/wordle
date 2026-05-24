@@ -19,12 +19,16 @@ export default function App() {
     onModeChange,
     onDifficultyChange,
     solution,
-    message
+    message,
+    playAgain
   } = useGame();
 
   useEffect(() => {
     const onKeyDown = (event) => {
-      if (event.key === 'Enter') {
+      if (isGameOver && event.key === ' ') {
+        event.preventDefault();
+        playAgain();
+      } else if (event.key === 'Enter') {
         onEnter();
       } else if (event.key === 'Backspace') {
         onDelete();
@@ -35,12 +39,12 @@ export default function App() {
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [onInput, onEnter, onDelete]);
+  }, [onInput, onEnter, onDelete, isGameOver, playAgain]);
 
   return (
     <div className="app-container">
       <header>
-        <h1>Wordle Clone</h1>
+        <h1>Wordal</h1>
         <div className="mode-selector">
           <button onClick={() => onModeChange('daily')} disabled={mode === 'daily'}>
             Daily
@@ -65,9 +69,14 @@ export default function App() {
         <div className="status">
           {message && <p>{message}</p>}
           {isGameOver && (
-            <p>
-              {isWin ? 'You win! 🎉' : `Game Over. Answer: ${solution.toUpperCase()}`}
-            </p>
+            <>
+              <p>
+                {isWin ? 'You win! 🎉' : `Game Over. Answer: ${solution.toUpperCase()}`}
+              </p>
+              <button onClick={playAgain} className="play-again-btn">
+                Play Again (Space)
+              </button>
+            </>
           )}
         </div>
 
