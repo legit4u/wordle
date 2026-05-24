@@ -1,0 +1,32 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif; background: #121213; color: #ffffff; }
+.app-container { min-height: 100vh; max-width: 500px; margin: 0 auto; padding: 20px; }
+header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+header h1 { margin: 0; font-size: 1.8rem; }
+.mode-selector button,
+.difficulty-selector button { margin-left: 6px; padding: 8px 12px; border-radius: 6px; border: 1px solid #555; background: #1a1a1a; color: #fff; }
+.mode-selector button:disabled,
+.difficulty-selector button:disabled { background: #383838; border-color: #444; }
+.difficulty-selector { display: flex; justify-content: flex-end; margin-bottom: 18px; }
+.board { display: grid; gap: 6px; margin-bottom: 18px; }
+.board > div { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.tile { width: 56px; height: 56px; border: 2px solid #3a3a3c; display: flex; justify-content: center; align-items: center; text-transform: uppercase; font-weight: 700; font-size: 1.25rem; }
+.tile-filled { border-color: #565758; }
+.tile-correct { background: #538d4e; border-color: #538d4e; color: #fff; }
+.tile-present { background: #b59f3b; border-color: #b59f3b; color: #fff; }
+.tile-absent { background: #3a3a3c; border-color: #3a3a3c; color: #fff; }
+.keyboard { display: grid; gap: 8px; }
+.keyboard-row { display: flex; gap: 6px; justify-content: center; }
+.key { min-width: 40px; padding: 10px; border-radius: 4px; border: 0; background: #818384; color: white; cursor: pointer; font-weight: 600; }
+.key-correct { background: #538d4e; }
+.key-present { background: #b59f3b; }
+.key-absent { background: #3a3a3c; }
+.key-large { min-width: 70px; }
+.status p { margin: 8px 0; }
+.statistics { margin-top: 18px; background: #18181b; border-radius: 8px; padding: 9px; }
+@media (max-width: 600px) {
+  .app-container { padding: 12px; }
+  .tile { width: 44px; height: 44px; font-size: 1rem; }
+  .keyboard-row { gap: 4px; }
+  .key { min-width: 32px; padding: 8px; }
+}
