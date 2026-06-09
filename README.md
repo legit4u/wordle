@@ -9,6 +9,7 @@ A small Wordle-style React app built with Vite.
 ```bash
 cd "c:\Users\mahes\code\wordle\wordle-app"
 npm install
+# Had to run this command from Administrator-Powershell to let this work: "Set-ExecutionPolicy RemoteSigned"
 ```
 
 2. Run the dev server

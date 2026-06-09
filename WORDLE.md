@@ -49,5 +49,19 @@ wordle-app/
 
 ---
 
+## Analytics and Ads
+Added GA4 analytics and AdSense - yet to test.
+
 ## Installation and running
+Hosted in 3 ways:
+1. npm run dev - runs in [localhost:](http://localhost:5173/)
+2. Host in github pages:
+  npm install --save-dev gh-pages (first time only)
+  npm run build (creates the dist folder)
+  npx gh-pages -d dist 
+  Load from here: https://legit4u.github.io/wordle/
+  (had to add . before the paths referencing the js files, in index.html before pushing)
+3. Netlify!
+Just deploy from there.
+
 

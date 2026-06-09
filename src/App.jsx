@@ -20,7 +20,10 @@ export default function App() {
     onDifficultyChange,
     solution,
     message,
-    playAgain
+    playAgain,
+    agentActive,
+    agentMessage,
+    requestAgentLine
   } = useGame();
 
   useEffect(() => {
@@ -46,20 +49,23 @@ export default function App() {
       <header>
         <h1>Wordal</h1>
         <div className="mode-selector">
-          <button onClick={() => onModeChange('daily')} disabled={mode === 'daily'}>
+          <button onClick={() => onModeChange('daily')} disabled={mode === 'daily' || agentActive}>
             Daily
           </button>
-          <button onClick={() => onModeChange('unlimited')} disabled={mode === 'unlimited'}>
+          <button onClick={() => onModeChange('unlimited')} disabled={mode === 'unlimited' || agentActive}>
             Unlimited
+          </button>
+          <button type="button" onClick={requestAgentLine} disabled={agentActive || isGameOver}>
+            Computer Ji
           </button>
         </div>
       </header>
 
       <div className="difficulty-selector">
-        <button onClick={() => onDifficultyChange('easy')} disabled={difficulty === 'easy'}>
+        <button onClick={() => onDifficultyChange('easy')} disabled={difficulty === 'easy' || agentActive}>
           Easy
         </button>
-        <button onClick={() => onDifficultyChange('hard')} disabled={difficulty === 'hard'}>
+        <button onClick={() => onDifficultyChange('hard')} disabled={difficulty === 'hard' || agentActive}>
           Hard
         </button>
       </div>
@@ -68,6 +74,8 @@ export default function App() {
         <Board guesses={guesses} currentGuess={currentGuess} turn={turn} />
         <div className="status">
           {message && <p>{message}</p>}
+          {agentMessage && <p>{agentMessage}</p>}
+          {agentActive && !isGameOver && <p>Agent is playing guess {guesses.length + 1} / 6</p>}
           {isGameOver && (
             <>
               <p>
