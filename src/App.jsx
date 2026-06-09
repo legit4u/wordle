@@ -21,9 +21,24 @@ export default function App() {
     solution,
     message,
     playAgain,
+    playerId,
+    playerName,
+    onlinePlayers,
+    incomingRequest,
+    outgoingRequest,
+    multiplayerMatch,
+    lineTimeLeft,
+    multiplayerMessage,
+    multiplayerStatus,
+    sendMultiplayerRequest,
+    acceptMultiplayerRequest,
+    declineMultiplayerRequest,
+    leaveMultiplayerMatch,
+    proposeRematch,
+    exitMultiplayerMode,
+    requestAgentLine,
     agentActive,
-    agentMessage,
-    requestAgentLine
+    agentMessage
   } = useGame();
 
   useEffect(() => {
@@ -49,15 +64,40 @@ export default function App() {
       <header>
         <h1>Wordal</h1>
         <div className="mode-selector">
-          <button onClick={() => onModeChange('daily')} disabled={mode === 'daily' || agentActive}>
+          <button onClick={() => onModeChange('daily')} disabled={mode === 'daily' || agentActive || multiplayerMatch?.status === 'active'}>
             Daily
           </button>
-          <button onClick={() => onModeChange('unlimited')} disabled={mode === 'unlimited' || agentActive}>
+          <button onClick={() => onModeChange('unlimited')} disabled={mode === 'unlimited' || agentActive || multiplayerMatch?.status === 'active'}>
             Unlimited
           </button>
-          <button type="button" onClick={requestAgentLine} disabled={agentActive || isGameOver}>
+          <button type="button" onClick={requestAgentLine} disabled={agentActive} style={{ display: multiplayerMatch ? 'none' : 'block' }}>
             Computer Ji
           </button>
+          <button
+            type="button"
+            onClick={sendMultiplayerRequest}
+            disabled={multiplayerMatch?.status === 'active' || outgoingRequest || incomingRequest}
+          >
+            Play with random player ({onlinePlayers.length})
+          </button>
+          {multiplayerMatch?.status === 'active' && (
+            <button type="button" onClick={leaveMultiplayerMatch}>
+              Leave Match
+            </button>
+          )}
+          {multiplayerMatch?.status === 'ended' && (
+            <>
+              <button type="button" onClick={proposeRematch}>
+                Propose Rematch
+              </button>
+              <button type="button" onClick={sendMultiplayerRequest}>
+                Offer to Another Random Player
+              </button>
+              <button type="button" onClick={exitMultiplayerMode}>
+                Exit Multiplayer Mode
+              </button>
+            </>
+          )}
         </div>
       </header>
 
@@ -71,9 +111,34 @@ export default function App() {
       </div>
 
       <main>
-        <Board guesses={guesses} currentGuess={currentGuess} turn={turn} />
+        <div className="multiplayer-bar">
+          {multiplayerMatch?.status === 'active' ? (
+            <>
+              <strong>Match:</strong> {playerName} vs {multiplayerMatch.names[multiplayerMatch.players.find((id) => id !== playerId)] || 'Opponent'}
+              <span className="badge">
+                {multiplayerMatch.currentPlayerId === playerId ? 'Your turn' : 'Opponent turn'}
+              </span>
+            </>
+          ) : null}
+        </div>
+        <Board guesses={multiplayerMatch?.guesses ?? guesses} currentGuess={currentGuess} turn={turn} />
         <div className="status">
           {message && <p>{message}</p>}
+          {multiplayerMessage && <p>{multiplayerMessage}</p>}
+          {incomingRequest && (
+            <div className="popup">
+              <p>
+                {incomingRequest.originName} wants to start a multiplayer match with you.
+              </p>
+              <button onClick={acceptMultiplayerRequest}>Accept</button>
+              <button onClick={declineMultiplayerRequest}>Decline</button>
+            </div>
+          )}
+          {multiplayerMatch?.status === 'active' && (
+            <p>
+              {multiplayerMatch.currentPlayerId === playerId ? 'Your turn' : `${multiplayerMatch.names[multiplayerMatch.currentPlayerId] || 'Opponent'}'s turn`} - {lineTimeLeft}s left
+            </p>
+          )}
           {agentMessage && <p>{agentMessage}</p>}
           {agentActive && !isGameOver && <p>Agent is playing guess {guesses.length + 1} / 6</p>}
           {isGameOver && (
@@ -86,9 +151,14 @@ export default function App() {
               </button>
             </>
           )}
+          {multiplayerMatch?.status === 'ended' && (
+            <p>
+              {multiplayerMatch.winnerId === playerId ? 'You won! 🎉' : `Match Over. Answer: ${multiplayerMatch.solution.toUpperCase()}`}
+            </p>
+          )}
         </div>
 
-        <Keyboard onInput={onInput} onEnter={onEnter} onDelete={onDelete} guesses={guesses} />
+        <Keyboard onInput={onInput} onEnter={onEnter} onDelete={onDelete} guesses={multiplayerMatch?.guesses ?? guesses} />
 
         <section className="statistics">
           <h2>Stats</h2>
