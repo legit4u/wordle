@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useGame } from './context/GameContext';
 import Board from './components/Board';
 import Keyboard from './components/Keyboard';
@@ -38,11 +38,18 @@ export default function App() {
     exitMultiplayerMode,
     requestAgentLine,
     agentActive,
-    agentMessage
+    agentMessage,
+    setPlayerName
   } = useGame();
+
+  const [showNameModal, setShowNameModal] = useState(false);
+  const [nameInput, setNameInput] = useState(playerName);
 
   useEffect(() => {
     const onKeyDown = (event) => {
+      // Don't process game keys if the name modal is open
+      if (showNameModal) return;
+
       if (isGameOver && event.key === ' ') {
         event.preventDefault();
         playAgain();
@@ -57,7 +64,20 @@ export default function App() {
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [onInput, onEnter, onDelete, isGameOver, playAgain]);
+  }, [onInput, onEnter, onDelete, isGameOver, playAgain, showNameModal]);
+
+  const handleMultiplayerRequest = () => {
+    setShowNameModal(true);
+  };
+
+  const handleNameSubmit = (name) => {
+    if (name.trim()) {
+      setPlayerName(name);
+      setNameInput(name);
+      setShowNameModal(false);
+      sendMultiplayerRequest(name);
+    }
+  };
 
   return (
     <div className="app-container">
@@ -75,7 +95,7 @@ export default function App() {
           </button>
           <button
             type="button"
-            onClick={sendMultiplayerRequest}
+            onClick={handleMultiplayerRequest}
             disabled={multiplayerMatch?.status === 'active' || outgoingRequest || incomingRequest}
           >
             Play with random player ({onlinePlayers.length})
@@ -169,6 +189,31 @@ export default function App() {
           <p>Max streak: {stats.maxStreak}</p>
           <p>Average guesses: {stats.avgGuesses}</p>
         </section>
+
+        {showNameModal && (
+          <div className="modal-overlay" onClick={() => setShowNameModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <h2>Enter Your Name</h2>
+              <p>Choose a name to display during multiplayer matches:</p>
+              <input
+                type="text"
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                placeholder="Enter your name"
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleNameSubmit(nameInput);
+                  }
+                }}
+                autoFocus
+              />
+              <div className="modal-buttons">
+                <button onClick={() => handleNameSubmit(nameInput)}>Play</button>
+                <button onClick={() => setShowNameModal(false)}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

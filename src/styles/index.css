@@ -33,3 +33,15 @@ header h1 { margin: 0; font-size: 1.8rem; }
   .keyboard-row { gap: 4px; }
   .key { min-width: 32px; padding: 8px; }
 }
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal-content { background: #18181b; border: 1px solid #3a3a3c; border-radius: 8px; padding: 24px; max-width: 400px; width: 90%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); }
+.modal-content h2 { margin-top: 0; margin-bottom: 12px; font-size: 1.5rem; }
+.modal-content p { margin: 0 0 16px 0; font-size: 0.95rem; color: #aaa; }
+.modal-content input { width: 100%; padding: 12px; border: 1px solid #555; border-radius: 6px; background: #262629; color: #fff; font-size: 1rem; margin-bottom: 16px; }
+.modal-content input:focus { outline: none; border-color: #538d4e; box-shadow: 0 0 5px rgba(83, 141, 78, 0.3); }
+.modal-buttons { display: flex; gap: 12px; justify-content: flex-end; }
+.modal-buttons button { padding: 10px 20px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.95rem; }
+.modal-buttons button:first-child { background: #538d4e; color: white; }
+.modal-buttons button:first-child:hover { background: #6aae5e; }
+.modal-buttons button:last-child { background: #3a3a3c; color: #fff; }
+.modal-buttons button:last-child:hover { background: #4a4a4c; }

@@ -40,7 +40,14 @@ export function GameProvider({ children }) {
   const [stats, setStats] = useState(readStats());
   const [difficulty, setDifficulty] = useState('easy');
   const [playerId] = useState(() => `p-${Math.random().toString(36).slice(2, 10)}`);
-  const [playerName] = useState(() => `Player-${Math.random().toString(36).slice(2, 6)}`);
+  const [playerName, setPlayerNameState] = useState(() => {
+    try {
+      const saved = localStorage.getItem('wordle-player-name');
+      return saved || `Player-${Math.random().toString(36).slice(2, 6)}`;
+    } catch {
+      return `Player-${Math.random().toString(36).slice(2, 6)}`;
+    }
+  });
   const [onlinePlayers, setOnlinePlayers] = useState([]);
   const [incomingRequest, setIncomingRequest] = useState(null);
   const [outgoingRequest, setOutgoingRequest] = useState(null);
@@ -302,6 +309,18 @@ export function GameProvider({ children }) {
     resetGame(mode, difficulty);
   };
 
+  const setPlayerName = (name) => {
+    const trimmedName = name.trim();
+    if (trimmedName) {
+      setPlayerNameState(trimmedName);
+      try {
+        localStorage.setItem('wordle-player-name', trimmedName);
+      } catch {
+        // ignore storage errors
+      }
+    }
+  };
+
   const writeMatchSession = (session) => {
     try {
       localStorage.setItem(matchStateKey(session.matchId), JSON.stringify(session));
@@ -414,7 +433,7 @@ export function GameProvider({ children }) {
     submitGuess(currentGuess);
   };
 
-  const sendMultiplayerRequest = () => {
+  const sendMultiplayerRequest = (customName) => {
     if (multiplayerMatch && multiplayerMatch.status === 'active') {
       setMultiplayerMessage('A multiplayer match is already in progress.');
       return;
@@ -426,12 +445,13 @@ export function GameProvider({ children }) {
       return;
     }
 
+    const nameToUse = customName || playerName;
     const randomPlayer = others[Math.floor(Math.random() * others.length)];
     const requestId = `req-${Math.random().toString(36).slice(2, 10)}`;
     const request = {
       requestId,
       originId: playerId,
-      originName: playerName,
+      originName: nameToUse,
       targetId: randomPlayer.id,
       targetName: randomPlayer.name,
       timestamp: Date.now(),
@@ -717,6 +737,7 @@ export function GameProvider({ children }) {
         requestAgentLine,
         agentActive,
         agentMessage,
+        setPlayerName,
       }}
     >
       {children}
